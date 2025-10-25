@@ -1,2 +1,3 @@
 # sync
-A program &amp; C# library to sync folders, ftp &amp; cloud storage
+
+A free, simple but fast command line tool & library to sync local, cloud & ftp folders.
