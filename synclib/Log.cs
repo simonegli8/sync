@@ -8,7 +8,7 @@ namespace Johnshope.SyncLib {
 
 	public class Log {
 
-		public Sync Job = null;
+		public SyncJob Job = null;
 
 		public int Uploads = 0;
 		public int Downloads = 0;
@@ -134,6 +134,5 @@ namespace Johnshope.SyncLib {
 				}
 			}
 		}
-
 	}
 }

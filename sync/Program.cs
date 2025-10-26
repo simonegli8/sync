@@ -15,7 +15,7 @@ namespace Johnshope.SyncLib {
 
 			bool wait = false;
 
-			var job = new Sync();
+			var job = new SyncJob();
 			
 			bool error = false;
 

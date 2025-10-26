@@ -14,6 +14,7 @@ namespace Johnshope.SyncLib {
 
 		public static void Copy(Stream src, Stream dest) {
 
+			src.CopyToAsync
 #if NET4
 			src.CopyTo(dest, Size);
 #else

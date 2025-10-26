@@ -8,7 +8,7 @@ namespace Johnshope.SyncLib {
 
 	public class FtpDirectory : FileOrDirectory, IDirectory {
 
-		public Sync Job { get; set; }
+		public SyncJob Job { get; set; }
 		public Log Log { get { return Job.Log; } }
 
 		Uri url;
@@ -16,7 +16,7 @@ namespace Johnshope.SyncLib {
 
 		public bool TransferProgress { get; set; }
 
-		public FtpDirectory(FileOrDirectory parent, Uri url, Sync job) {
+		public FtpDirectory(FileOrDirectory parent, Uri url, SyncJob job) {
 			Job = job;
 			Parent = parent;
 			if (url.Scheme != "ftp" && url.Scheme != "ftps") throw new NotSupportedException();
@@ -153,7 +153,7 @@ namespace Johnshope.SyncLib {
 			var list = dir.List();
 			var subdirs =  list.OfType<FtpDirectory>();
 
-			var n = new Sync.Counter();
+			var n = new SyncJob.Counter();
 			n.N = subdirs.Count();
 
 			var finished = (EventHandler)((sender, args) => {

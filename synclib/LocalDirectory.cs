@@ -4,19 +4,20 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Web;
+using System.Threading.Tasks;
 
 namespace Johnshope.SyncLib {
 
 	class LocalDirectory: FileOrDirectory, IDirectory {
 
-		public Sync Job { get; set; }
-		public Log Log { get { return Job.Log; } }
+		public SyncJob Job { get; set; }
+		public Log Log => Job.Log;
 
 		public Uri Url { get; set; }
 
 		public string Path { get { return HttpUtility.UrlDecode(Url.LocalPath); } }
 
-		public LocalDirectory(FileOrDirectory parent, Uri url, Sync job) {
+		public LocalDirectory(FileOrDirectory parent, Uri url, SyncJob job) {
 			Job = job;
             Parent = parent;
             if (!url.ToString().Contains(':')) {
@@ -34,7 +35,7 @@ namespace Johnshope.SyncLib {
 		public IDirectory Source { get; set; }
 		public IDirectory Destination { get; set; }
 
-		public DirectoryListing List() {
+		public async Task<DirectoryListing> List() {
 			try {
 				var info = new DirectoryInfo(Path);
 				if (info.Exists) {
@@ -51,24 +52,27 @@ namespace Johnshope.SyncLib {
 			return new DirectoryListing();
 		}
 
-		public void WriteFile(Stream sstream, FileOrDirectory src) {
-			if (sstream == null) return;
-			try {
-				var path = System.IO.Path.Combine(Path, src.Name);
-				using (var dstream = File.Create(path)) {
-					if (sstream is PipeStream) {
-						((PipeStream)sstream).Read(dstream);
-					} else {
-						Streams.Copy(sstream, dstream);
+		public async Task WriteFile(Stream sstream, FileOrDirectory src) {
+			if (sstream != null)
+			{
+				try
+				{
+					var path = System.IO.Path.Combine(Path, src.Name);
+					using (var dstream = File.Create(path))
+					{
+						if (sstream is PipeStream pipe) pipe.Read(dstream);
+						else await sstream.CopyToAsync(dstream);
 					}
+					File.SetLastAccessTimeUtc(path, src.ChangedUtc);
 				}
-				File.SetLastAccessTimeUtc(path, src.ChangedUtc);
-			} catch (Exception ex) {
-				Job.Failure(src, ex);
+				catch (Exception ex)
+				{
+					Job.Failure(src, ex);
+				}
 			}
 		}
 
-		public Stream ReadFile(FileOrDirectory src) {
+		public async Task<Stream> ReadFile(FileOrDirectory src) {
 			try {
 				var path = System.IO.Path.Combine(Path, src.Name);
 				return File.OpenRead(path);
@@ -78,7 +82,7 @@ namespace Johnshope.SyncLib {
 			return null;
 		}
 
-		public void DeleteFile(FileOrDirectory dest) {
+		public async Task DeleteFile(FileOrDirectory dest) {
 			try {
 				var path = System.IO.Path.Combine(Path, dest.Name);
 				if (new FileInfo(path).FullName != new FileInfo(Job.LogFile).FullName) System.IO.File.Delete(path);
@@ -87,7 +91,7 @@ namespace Johnshope.SyncLib {
 			}
 		}
 
-		public void DeleteDirectory(FileOrDirectory dest) {
+		public async Task DeleteDirectory(FileOrDirectory dest) {
 			try {
 				System.IO.Directory.Delete(((LocalDirectory)dest).Path, true);
 			} catch (Exception ex) {
@@ -95,18 +99,18 @@ namespace Johnshope.SyncLib {
 			}
 		}
 
-		public void Delete(FileOrDirectory dest) {
+		public async Task Delete(FileOrDirectory dest) {
 			try {
 				var path = System.IO.Path.Combine(Path, dest.Name);
 				if (dest.Class == ObjectClass.File) {
-					if (new FileInfo(path).FullName != new FileInfo(Job.LogFile).FullName) System.IO.File.Delete(path);
+					if (new FileInfo(path).FullName != new FileInfo(Job.LogFile).FullName) File.Delete(path);
 				}  else System.IO.Directory.Delete(path, true);
 			} catch (Exception ex) {
 				Job.Failure(dest, ex);
 			}
 		}
 
-		public IDirectory CreateDirectory(FileOrDirectory src) {
+		public async Task<IDirectory> CreateDirectory(FileOrDirectory src) {
 			try {
 				string path;
 				if (src == null) path = Path;

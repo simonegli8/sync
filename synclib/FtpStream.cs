@@ -8,14 +8,14 @@ namespace Johnshope.SyncLib {
 
 	public class FtpStream: PipeStream {
 
-		public Sync Job { get; set; }
+		public SyncJob Job { get; set; }
 		public Log Log { get { return Job.Log; } }
 
 		public FtpClient Client { get; set; }
 		public string Path { get; set; }
 		public long Size { get; set; }
 		DateTime start;
-		public FtpStream(Sync job) : base() { start = DateTime.Now; Job = job; }
+		public FtpStream(SyncJob job) : base() { start = DateTime.Now; Job = job; }
 
 		protected override void Dispose(bool disposing) {
 			base.Dispose(disposing);

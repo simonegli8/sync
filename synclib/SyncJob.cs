@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Johnshope.SyncLib {
 	public enum CopyMode { Update, Clone, Add }
 
-	public class Sync {
+	public class SyncJob {
 
 		static readonly TimeSpan dt = TimeSpan.FromMinutes(1); // minimal file time resolution
 
@@ -16,6 +18,7 @@ namespace Johnshope.SyncLib {
 		public bool Quiet { get; set; }
 		public Log Log = null;
 		public string ExcludePatterns { get; set; }
+		public CancellationTokenSource Cancel = new CancellationTokenSource();
 		public Threads Threads = new Threads();
 		public FtpConnections Connections;
 
@@ -28,7 +31,7 @@ namespace Johnshope.SyncLib {
 
 		public IDirectory Root(FileOrDirectory fd) { if (fd.Parent == null) return (IDirectory)fd; else return Root(fd.Parent); }
 
-		public Sync() {
+		public SyncJob() {
 			Log = new Log { Job = this };
 			Connections = new FtpConnections { Job = this };
 			ExcludePatterns = "";

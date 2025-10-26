@@ -5,13 +5,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Johnshope.SyncLib {
 
 	public enum ObjectClass { File, Directory }
 
 	public class FileOrDirectory {
-		public Sync Job { get; set; }
+		public SyncJob Job { get; set; }
 		public FileOrDirectory Parent { get; set; }
 		public string RelativePath { get { if (Parent == null) return Name; else return Parent.RelativePath + "/" + Name; } }
 		public string Name;
@@ -35,15 +36,15 @@ namespace Johnshope.SyncLib {
 	}
 
 	public interface IDirectory {
-		Sync Job { get; set; }
+		SyncJob Job { get; set; }
 		Uri Url { get; set; }
-		DirectoryListing List();
-		void WriteFile(Stream file, FileOrDirectory src);
-		Stream ReadFile(FileOrDirectory src);
-		void Delete(FileOrDirectory dest);
-		void DeleteFile(FileOrDirectory dest);
-		void DeleteDirectory(FileOrDirectory dest);
-		IDirectory CreateDirectory(FileOrDirectory src);
+		Task<DirectoryListing> List();
+		Task WriteFile(Stream file, FileOrDirectory src);
+		Task<Stream> ReadFile(FileOrDirectory src);
+		Task Delete(FileOrDirectory dest);
+		Task DeleteFile(FileOrDirectory dest);
+		Task DeleteDirectory(FileOrDirectory dest);
+		Task<IDirectory> CreateDirectory(FileOrDirectory src);
 		IDirectory Source { get; set; }
 		IDirectory Destination { get; set; }
 	}

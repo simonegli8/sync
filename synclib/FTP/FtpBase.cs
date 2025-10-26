@@ -431,7 +431,7 @@ namespace Starksoft.Net.Ftp
 
         #endregion
 
-		  public Johnshope.SyncLib.Sync Job { get; set; }
+		  public Johnshope.SyncLib.SyncJob Job { get; set; }
         #region Private Variables and Constants
 
         private TcpClient _commandConn;

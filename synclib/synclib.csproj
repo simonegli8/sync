@@ -24,9 +24,19 @@
         <DefineConstants>TRACE</DefineConstants>
     </PropertyGroup>
     <ItemGroup>
-      <None Update="FTP\references\Starksoft.Net.Proxy.dll">
-        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-      </None>
+        <Compile Remove="Threads.cs" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="Threads.cs" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="FluentFTP" Version="53.0.2" />
+        <PackageReference Include="NeoSmart.AsyncLock" Version="3.2.1" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Update="FTP\references\Starksoft.Net.Proxy.dll">
+            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        </None>
         <Reference Include="FTP\references\Starksoft.Net.Proxy.dll" />
     </ItemGroup>
 </Project>
